@@ -88,10 +88,11 @@ public class UserServiceImpl implements UserService {
         int i = userMapper.updateById(user);
         if (i!=0){
             result.setFlag(true);
-            result.setMessage("数据更新成功");
+            result.setMessage("更新成功");
+            result.setData(user);
         }else {
             result.setFlag(false);
-            result.setMessage("数据更新失败");
+            result.setMessage("更新失败");
         }
         return result;
     }

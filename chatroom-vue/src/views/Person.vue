@@ -68,10 +68,13 @@ export default {
         const { data: res } = await this.$http.put('/user', this.form)
         if (res.flag) {
           this.$message.success(res.message)
+          // 更新sessionStorage中user
+          sessionStorage.setItem('user', JSON.stringify(res.data))
+          // 自定义事件：以此来触发layout更新用户信息
+          this.$emit('userInfo')
         } else {
           return this.$message.error(res.message)
         }
-        this.load() // 刷新我的信息
       })
     }
   }

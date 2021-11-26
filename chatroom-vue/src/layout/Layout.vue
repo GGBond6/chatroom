@@ -8,7 +8,7 @@
       <!--侧边菜单-->
       <Menu></Menu>
       <!--右侧内容-->
-      <router-view style="flex:1"/>
+      <router-view @userInfo="refreshUser" style="flex:1"/>
     </div>
   </div>
 </template>
