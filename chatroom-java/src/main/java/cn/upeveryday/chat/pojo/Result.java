@@ -1,4 +1,4 @@
-package cn.upeveryday.websocket.pojo;
+package cn.upeveryday.chat.pojo;
 
 import lombok.Data;
 

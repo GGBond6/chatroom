@@ -1,6 +1,6 @@
-package cn.upeveryday.websocket.mapper;
+package cn.upeveryday.chat.mapper;
 
-import cn.upeveryday.websocket.pojo.Message;
+import cn.upeveryday.chat.pojo.Message;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 /**

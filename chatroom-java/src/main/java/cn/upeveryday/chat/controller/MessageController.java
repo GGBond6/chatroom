@@ -1,9 +1,9 @@
-package cn.upeveryday.websocket.controller;
+package cn.upeveryday.chat.controller;
 
 import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
-import cn.upeveryday.websocket.service.MessageService;
+import cn.upeveryday.chat.service.MessageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,31 +29,33 @@ public class MessageController {
     /**
      * 记录当前在线连接数
      * 使用Map存储不同客户端对应的不同的session
+     * 可以通过Session对象发送消息给指定的客户端
      * 定义为static是因为所有对象共用一个map即可
      * ConcurrentHashMap支持并发的子实现类
      */
     private static Map<String, Session> onlineUsers = new ConcurrentHashMap<>();
 
     /**
-     * 连接建立成功调用的方法
+     * 连接建立成功
+     * 将当前所有在线用户，存储到result对象中的JSON数组users中
      */
     @OnOpen
     public void onOpen(Session session, @PathParam("username") String username) {
-        onlineUsers.put(username, session);
-        log.info("新用户{}加入，当前在线人数为{}", username, onlineUsers.size());
+            onlineUsers.put(username, session);
+            log.info("新用户{}加入，当前在线人数为{}", username, onlineUsers.size());
 
-        JSONObject result = new JSONObject();
-        JSONArray array = new JSONArray();
-        //user为数组类型，result={"user":[]}
-        result.set("users", array);
-        for (Object key : onlineUsers.keySet()) {
-            JSONObject jsonObject = new JSONObject();
-            jsonObject.set("username", key);
-            array.add(jsonObject);
-            //result={"user:[{"username":xxx1},{"username":xxx2]}}
-        }
-        //将map对象result转换成json字符串，并且服务端将消息传给客户端（客户端浏览器存储在sessionStorage中）
-        sendAllMessage(JSONUtil.toJsonStr(result));
+            JSONObject result = new JSONObject();
+            JSONArray array = new JSONArray();
+            //users为数组类型，result={"users":[]}
+            result.set("users", array);
+            for (Object key : onlineUsers.keySet()) {
+                JSONObject jsonObject = new JSONObject();
+                jsonObject.set("username", key);
+                array.add(jsonObject);
+                //result={"users:[{"username":xxx1},{"username":xxx2]}}
+            }
+            //将对象序列化成json字符串进行传输，并且将消息发送给所有人
+            sendAllMessage(JSONUtil.toJsonStr(result));
     }
 
     /**
@@ -73,7 +75,7 @@ public class MessageController {
     @OnMessage
     public void onMessage(String message, Session session, @PathParam("username") String username) {
         log.info("客户端收到用户{}的消息：{}", username, message);
-        //将字符串解析为json对象
+        //消息反序列化：将字符串解析为json对象
         JSONObject msg = JSONUtil.parseObj(message);
         //to表示发送给哪个用户（保存在客户端发送来的message中）
         String toUsername = msg.getStr("to");
@@ -100,7 +102,7 @@ public class MessageController {
     }
 
     /**
-     * 给所有客户端发送消息
+     * 全局消息
      *
      * @param message
      */
@@ -108,7 +110,10 @@ public class MessageController {
         try {
             for (Session session : onlineUsers.values()) {
                 log.info("服务端给客户端[{}]发送消息{}", session.getId(), message);
-                session.getBasicRemote().sendText(message);
+                //同步
+                //session.getBasicRemote().sendText(message);
+                //异步（非阻塞）
+                session.getAsyncRemote().sendText(message);
             }
         } catch (Exception e) {
             log.error("服务端发送消息给客户端失败", e);
@@ -116,17 +121,17 @@ public class MessageController {
     }
 
     /**
-     * 给指定用户发送消息
+     * 单个消息
      *
      * @param message
      */
     private void sendMessage(String message, Session toSession) {
         try {
             log.info("服务端给客户端[{}]发送消息{}", toSession.getId(), message);
-            toSession.getBasicRemote().sendText(message);
+            //toSession.getBasicRemote().sendText(message);
+            toSession.getAsyncRemote().sendText(message);
         } catch (Exception e) {
             log.error("服务端发送消息给客户端失败", e);
         }
     }
-
 }

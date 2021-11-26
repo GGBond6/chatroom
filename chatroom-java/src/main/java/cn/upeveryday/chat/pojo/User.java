@@ -1,4 +1,4 @@
-package cn.upeveryday.websocket.pojo;
+package cn.upeveryday.chat.pojo;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;

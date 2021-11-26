@@ -1,6 +1,6 @@
-package cn.upeveryday.websocket.service.impl;
+package cn.upeveryday.chat.service.impl;
 
-import cn.upeveryday.websocket.service.MessageService;
+import cn.upeveryday.chat.service.MessageService;
 import org.springframework.stereotype.Service;
 
 /**

@@ -1,4 +1,4 @@
-package cn.upeveryday.websocket.config;
+package cn.upeveryday.chat.config;
 
 /**
  * @author ggbond

@@ -1,6 +1,6 @@
-package cn.upeveryday.websocket.mapper;
+package cn.upeveryday.chat.mapper;
 
-import cn.upeveryday.websocket.pojo.User;
+import cn.upeveryday.chat.pojo.User;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Select;

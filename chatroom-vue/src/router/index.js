@@ -11,8 +11,6 @@ Vue.use(VueRouter)
 const routes = [
   { path: '/login', component: Login },
   { path: '/register', component: Register },
-  { path: '/person', component: Person },
-
   {
     path: '/',
     component: Layout,
@@ -23,7 +21,8 @@ const routes = [
         // Chatroom 会被渲染在 Layout 的 <router-view> 中
         path: 'chatroom', component: ChatRoom
       },
-      { path: '/user', component: User }
+      { path: '/user', component: User },
+      { path: '/person', component: Person }
     ]
   }
   // { path: '/', redirect: '/login' }

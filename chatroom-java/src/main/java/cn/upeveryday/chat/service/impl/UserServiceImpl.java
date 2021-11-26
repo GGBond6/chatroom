@@ -1,10 +1,10 @@
-package cn.upeveryday.websocket.service.impl;
+package cn.upeveryday.chat.service.impl;
 
 import cn.hutool.core.util.StrUtil;
-import cn.upeveryday.websocket.mapper.UserMapper;
-import cn.upeveryday.websocket.pojo.Result;
-import cn.upeveryday.websocket.pojo.User;
-import cn.upeveryday.websocket.service.UserService;
+import cn.upeveryday.chat.mapper.UserMapper;
+import cn.upeveryday.chat.pojo.Result;
+import cn.upeveryday.chat.pojo.User;
+import cn.upeveryday.chat.service.UserService;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.springframework.beans.factory.annotation.Autowired;

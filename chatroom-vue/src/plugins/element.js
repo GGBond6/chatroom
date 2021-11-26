@@ -6,7 +6,7 @@ import {
   Dropdown, DropdownItem, DropdownMenu, Menu,
   MenuItem, MenuItemGroup, Submenu,
   Avatar, Table, TableColumn, Popconfirm,
-  Pagination, Dialog, Radio
+  Pagination, Dialog, Radio, Descriptions, DescriptionsItem
 } from 'element-ui'
 // 使用Vue.use进行全局注册
 Vue.use(Button)
@@ -34,5 +34,7 @@ Vue.use(Popconfirm)
 Vue.use(Pagination)
 Vue.use(Dialog)
 Vue.use(Radio)
+Vue.use(Descriptions)
+Vue.use(DescriptionsItem)
 
 Vue.prototype.$message = Message

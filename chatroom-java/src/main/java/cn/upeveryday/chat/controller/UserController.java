@@ -1,19 +1,10 @@
-package cn.upeveryday.websocket.controller;
+package cn.upeveryday.chat.controller;
 
-import cn.hutool.core.util.StrUtil;
-import cn.upeveryday.websocket.mapper.UserMapper;
-import cn.upeveryday.websocket.pojo.Result;
-import cn.upeveryday.websocket.pojo.User;
-import cn.upeveryday.websocket.service.impl.UserServiceImpl;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import org.apache.ibatis.annotations.Delete;
+import cn.upeveryday.chat.pojo.Result;
+import cn.upeveryday.chat.pojo.User;
+import cn.upeveryday.chat.service.impl.UserServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * @author ggbond

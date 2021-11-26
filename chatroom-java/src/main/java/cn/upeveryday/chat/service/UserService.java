@@ -1,7 +1,7 @@
-package cn.upeveryday.websocket.service;
+package cn.upeveryday.chat.service;
 
-import cn.upeveryday.websocket.pojo.Result;
-import cn.upeveryday.websocket.pojo.User;
+import cn.upeveryday.chat.pojo.Result;
+import cn.upeveryday.chat.pojo.User;
 
 /**
  * @author ggbond

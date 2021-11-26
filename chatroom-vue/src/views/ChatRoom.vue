@@ -10,10 +10,12 @@
           </div>
           <!--用户列表-->
           <div v-for="(user,index) in users" class="content" :key="index">
-            <span>{{ user.username }}</span>
-            <!--当用户点击不同聊天图标时，更换当前聊天对象-->
-            <i class="el-icon-chat-dot-round" @click="chatUser=user.username"></i>
-            <span v-if="user.username===chatUser" class="chatting">chatting</span>
+            <div v-if="user.username!=='undefined'">
+              <span >{{ user.username }}</span>
+              <!--当用户点击不同聊天图标时，更换当前聊天对象-->
+              <i class="el-icon-chat-dot-round" @click="chatUser=user.username"></i>
+              <span v-if="user.username===chatUser" class="chatting">chatting</span>
+            </div>
           </div>
         </el-card>
       </el-col>
@@ -24,6 +26,7 @@
           <div class="header">{{ chatUser }}</div>
           <!--绑定content为此标签的innerHTML，content需要动态渲染上去-->
           <div class="content" v-html="content"></div>
+
           <div class="footer">
             <textarea class="textarea" v-model="text"></textarea>
             <div class="send">
@@ -72,7 +75,7 @@ export default {
           to: this.chatUser,
           text: this.text
         }
-        // 将组装好的json发送给服务端，由服务端进行转发
+        // 将json对象序列化，并发送给服务端
         socket.send(JSON.stringify(message))
         this.messages.push({
           user: this.user.username,
@@ -92,11 +95,11 @@ export default {
       const _this = this
       //
       if (typeof (WebSocket) === 'undefined') {
-        console.log('您的浏览器不支持websocket')
+        this.$message.error('当前浏览器不支持此聊天应用')
       } else {
-        console.log('您的浏览器支持websocket')
-        // const socketUrl = 'ws://localhost:8080/chat/' + username
-        const socketUrl = 'ws://8.133.163.7:8080/chat/' + username
+        console.log('当前浏览器支持websocket协议')
+        const socketUrl = 'ws://localhost:8080/chat/' + username
+        // const socketUrl = 'ws://8.133.163.7:8080/chat/' + username
         if (socket != null) {
           // 还存在socket，那么关闭
           socket.close()
@@ -111,7 +114,7 @@ export default {
         // 接收消息事件（获得客户端的消息）
         socket.onmessage = function (msg) {
           console.log('收到数据：' + msg.data)
-          // 对收到的json数据进行解析 {"users": [{"username": "zhang"},{ "username": "admin"}]}
+          // 对收到的json数据反序列化 {"users": [{"username": "zhang"},{ "username": "admin"}]}
           const data = JSON.parse(msg.data)
           if (data.users) {
             // 获取当前连接的所有用户信息，并且排除自身

@@ -1,13 +1,10 @@
 <template>
   <div style="padding: 10px">
     <!--功能区域-->
-    <div style="margin: 10px 0 ">
-      <el-button @click="add" size="small" type="primary">新增</el-button>
-    </div>
-    <!--搜索区域-->
     <div style="margin: 10px 0">
-      <el-input v-model="search" clearable placeholder="请输入关键字" style="width: 20%"></el-input>
+      <el-input v-model="search" clearable placeholder="请输入关键字" style="width: 15%"></el-input>
       <el-button @click="load" size="small" type="primary" style="margin-left: 5px">查询</el-button>
+      <el-button @click="add" size="small" type="primary" style="position: absolute;right: 5%">新增</el-button>
     </div>
     <el-table
       v-loading="loading"
@@ -67,18 +64,18 @@
     </div>
     <!--弹窗-->
     <el-dialog
-      title="提示"
+      title="信息"
       :visible.sync="dialogVisible"
       width="30%"
       :before-close="handleClose">
       <el-form ref="formRef" :model="form" :rules="formRules" label-width="120px">
-        <el-form-item label="用户名">
+        <el-form-item label="用户名" prop="username">
           <el-input v-model="form.username" style="width: 80%"></el-input>
         </el-form-item>
-        <el-form-item label="密码">
+        <el-form-item label="密码" prop="password">
           <el-input v-model="form.password" style="width: 80%"></el-input>
         </el-form-item>
-        <el-form-item label="昵称">
+        <el-form-item label="昵称" prop="nickname">
           <el-input v-model="form.nickname" style="width: 80%"></el-input>
         </el-form-item>
         <el-form-item label="年龄">
@@ -87,7 +84,6 @@
         <el-form-item label="性别">
           <el-radio v-model="form.sex" label="男">男</el-radio>
           <el-radio v-model="form.sex" label="女">女</el-radio>
-          <el-radio v-model="form.sex" label="未知">未知</el-radio>
         </el-form-item>
         <el-form-item label="地址">
           <el-input type="textarea" v-model="form.address" style="width: 80%"></el-input>
@@ -121,12 +117,15 @@ export default {
       form: {},
       search: '',
       formRules: {
+        // prop="username"
         username: [
-          {
-            required: true,
-            message: '请输入用户名',
-            trigger: 'blur'
-          }
+          { required: true, message: '请输入用户名', trigger: 'blur' }
+        ],
+        password: [
+          { required: true, message: '请输入密码', trigger: 'blur' }
+        ],
+        nickname: [
+          { required: true, message: '请输入昵称', trigger: 'blur' }
         ]
       }
     }
