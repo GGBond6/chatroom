@@ -7,7 +7,7 @@ import org.springframework.web.socket.server.standard.ServerEndpointExporter;
 /**
  * @author ggbond
  */
-@Configuration
+//@Configuration
 public class WebsocketConfig {
     /**
      * 注入ServerEndpointExporter对象，该bean会自动注册使用@ServerEndpoint注解申明的Endpoint

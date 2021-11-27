@@ -9,4 +9,5 @@ import lombok.Data;
 public class RolePermission {
     private Integer roleId;
     private Integer permissionId;
+    private String comment;
 }

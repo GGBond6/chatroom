@@ -27,6 +27,9 @@
 </template>
 
 <script>
+
+import { dynamicRouter } from '@/router/permissions'
+
 export default {
   name: 'Login',
   data () {
@@ -62,6 +65,9 @@ export default {
           this.$message.success(res.message)
           // 将data保存至sessionStorage中
           sessionStorage.setItem('user', JSON.stringify(res.data))
+          // 动态的初始化路由信息
+          dynamicRouter()
+          // 跳转后台主页
           return this.$router.push('/')
         }
         return this.$message.error(res.message)

@@ -23,7 +23,7 @@ class PermissionMapperTest {
 
     @Test
     void getPermissionsById() {
-        List<Permission> permissions = permissionMapper.getPermissionsById(1);
+        List<Permission> permissions = permissionMapper.getPermissionsById(2);
         for (Permission permission:
              permissions) {
             System.out.println(permission.getPath());

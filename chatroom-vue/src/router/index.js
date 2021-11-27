@@ -6,6 +6,7 @@ import ChatRoom from '@/views/ChatRoom'
 import Layout from '@/layout/Layout'
 import Person from '@/views/Person'
 import User from '@/views/User'
+import Message from '@/views/Message'
 Vue.use(VueRouter)
 
 const routes = [
@@ -22,10 +23,10 @@ const routes = [
         path: 'chatroom', component: ChatRoom
       },
       { path: '/user', component: User },
-      { path: '/person', component: Person }
+      { path: '/person', component: Person },
+      { path: '/message', component: Message }
     ]
   }
-  // { path: '/', redirect: '/login' }
 ]
 
 const router = new VueRouter({
