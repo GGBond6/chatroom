@@ -1,6 +1,7 @@
 package cn.upeveryday.chat.service.impl;
 
 import cn.hutool.core.util.StrUtil;
+import cn.upeveryday.chat.mapper.PermissionMapper;
 import cn.upeveryday.chat.mapper.UserMapper;
 import cn.upeveryday.chat.pojo.Result;
 import cn.upeveryday.chat.pojo.User;
@@ -19,15 +20,16 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private UserMapper userMapper;
 
+    @Autowired
+    private PermissionMapper permissionMapper;
+
     @Override
     public Result login(String username, String password) {
         Result result = new Result();
-//        QueryWrapper wrapper = new QueryWrapper();
-//        wrapper.eq("username", username);
-//        wrapper.eq("password", password);
-//        User user = userMapper.selectOne(wrapper);
         User user = userMapper.selectByUsernameAndPassword(username, password);
         if (user != null) {
+            //根据从数据库获取的userId，再从数据库获取其权限列表
+            user.setPermissions(permissionMapper.getPermissionsById(user.getId()));
             result.setFlag(true);
             result.setMessage("登录成功");
             result.setData(user);

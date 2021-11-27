@@ -70,7 +70,7 @@ export default {
           this.$message.success(res.message)
           // 更新sessionStorage中user
           sessionStorage.setItem('user', JSON.stringify(res.data))
-          // 自定义事件：以此来触发layout更新用户信息
+          // 触发自定义事件，父组件会监听此事件，进而执行更新sessionStorage操作，实现个人信息与头组件之间的信息同步
           this.$emit('userInfo')
         } else {
           return this.$message.error(res.message)
