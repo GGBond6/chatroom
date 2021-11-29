@@ -12,7 +12,7 @@ import java.util.List;
  */
 @Data
 public class User {
-    @TableId(type = IdType.INPUT)
+    @TableId(type = IdType.AUTO)
     private Integer id;
     private String username;
     private String password;

@@ -7,9 +7,12 @@ import cn.upeveryday.chat.pojo.Result;
 import cn.upeveryday.chat.pojo.User;
 import cn.upeveryday.chat.service.UserService;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import static com.baomidou.mybatisplus.core.toolkit.Wrappers.query;
 
 /**
  * @author ggbond
@@ -29,7 +32,7 @@ public class UserServiceImpl implements UserService {
         User user = userMapper.selectByUsernameAndPassword(username, password);
         if (user != null) {
             //根据从数据库获取的userId，再从数据库获取其权限列表
-            user.setPermissions(permissionMapper.getPermissionsById(user.getId()));
+            user.setPermissions(permissionMapper.getPermissionsByUserId(user.getId()));
             result.setFlag(true);
             result.setMessage("登录成功");
             result.setData(user);
@@ -103,7 +106,6 @@ public class UserServiceImpl implements UserService {
     public Result findPage(Integer pageNum, Integer pageSize, String search) {
         Result result = new Result();
 
-        //分页查询：封装page对象，根据page对象和条件查询；得到的还是page对象，调用getRecords获取数据
         Page<User>  userPage=new Page<>(pageNum, pageSize);
         QueryWrapper wrapper = new QueryWrapper();
         //当search不为空时，再加入到条件构造器

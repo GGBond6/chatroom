@@ -6,6 +6,7 @@
       <el-button @click="load" size="small" type="primary" style="margin:0 5px" icon="el-icon-search">查询</el-button>
       <el-button @click="add" size="small" type="primary" icon="el-icon-plus">新增</el-button>
     </div>
+    <!--数据区-->
     <el-table
       v-loading="loading"
       size="small"
@@ -20,34 +21,34 @@
       >
       </el-table-column>
       <el-table-column
-        prop="username"
-        label="用户名">
+        prop="name"
+        label="名称">
       </el-table-column>
       <el-table-column
-        prop="nickname"
-        label="昵称">
+        prop="comment"
+        label="备注">
       </el-table-column>
+      <!--给角色分配权限-->
       <el-table-column
-        prop="age"
-        label="年龄">
-      </el-table-column>
-      <el-table-column
-        prop="sex"
-        label="性别">
-      </el-table-column>
-      <el-table-column
-        prop="address"
-        label="地址">
-      </el-table-column>
-      <el-table-column
-        prop="avatar"
-        label="头像"
-        show-overflow-tooltip=true>
+        label="权限菜单" prop="permissions">
+        <!--作用域插槽：子组件给父组件传递数据（scope对象）-->
+        <template slot-scope="scope">
+          <!--v-model绑定的是选中的value组成的数组-->
+          <el-select v-model="scope.row.permissionsId" multiple placeholder="请选择">
+            <el-option
+              v-for="item in allPermissions"
+              :key="item.id"
+              :label="item.comment"
+              :value="item.id">
+            </el-option>
+          </el-select>
+        </template>
       </el-table-column>
       <!--操作-->
       <el-table-column label="操作">
         <!--通过带属性的插槽可以获取到 row, column, $index 和 store（table 内部的状态管理）的数据-->
         <template slot-scope="scope">
+          <el-button size="mini" type="primary" @click="handleChange(scope.row)">保存权限菜单</el-button>
           <el-button size="mini" icon="el-icon-edit" title="编辑"
                      @click="handleEdit( scope.row)"></el-button>
           <el-button size="mini" type="danger" icon="el-icon-delete" title="删除"
@@ -58,8 +59,8 @@
     <!--分页-->
     <div style="margin: 10px 0">
       <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange"
-        :current-page="currentPage" :page-sizes="pageSizes" :page-size="pageSize" :total="total"
-        layout="total, sizes, prev, pager, next, jumper">
+                     :current-page="currentPage" :page-sizes="pageSizes" :page-size="pageSize" :total="total"
+                     layout="total, sizes, prev, pager, next, jumper">
       </el-pagination>
     </div>
     <!--弹窗-->
@@ -67,28 +68,12 @@
       title="信息"
       :visible.sync="dialogVisible"
       width="30%">
-      <el-form ref="userForm" :model="form" :rules="formRules" label-width="120px">
-        <el-form-item label="用户名" prop="username">
-          <el-input v-model="form.username" style="width: 80%"></el-input>
+      <el-form ref="roleForm" :model="form" :rules="formRules" label-width="120px">
+        <el-form-item label="用户名" prop="name">
+          <el-input v-model="form.name" style="width: 80%"></el-input>
         </el-form-item>
-        <el-form-item label="密码" prop="password">
-          <el-input v-model="form.password" style="width: 80%"></el-input>
-        </el-form-item>
-        <el-form-item label="昵称" prop="nickname">
-          <el-input v-model="form.nickname" style="width: 80%"></el-input>
-        </el-form-item>
-        <el-form-item label="年龄" prop="age">
-          <el-input v-model="form.age" style="width: 80%"></el-input>
-        </el-form-item>
-        <el-form-item label="性别" prop="sex">
-          <el-radio v-model="form.sex" label="男">男</el-radio>
-          <el-radio v-model="form.sex" label="女">女</el-radio>
-        </el-form-item>
-        <el-form-item label="地址" prop="address">
-          <el-input type="textarea" v-model="form.address" style="width: 80%"></el-input>
-        </el-form-item>
-        <el-form-item label="头像" prop="avatar">
-          <el-input v-model="form.avatar" style="width: 80%"></el-input>
+        <el-form-item label="备注" prop="comment">
+          <el-input v-model="form.comment" style="width: 80%"></el-input>
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
@@ -100,10 +85,9 @@
   </div>
 
 </template>
-
 <script>
 export default {
-  name: 'User',
+  name: 'Role',
   data () {
     return {
       loading: true,
@@ -116,17 +100,11 @@ export default {
       form: {},
       search: '',
       formRules: {
-        // prop="username"
-        username: [
-          { required: true, message: '请输入用户名', trigger: 'blur' }
-        ],
-        password: [
-          { required: true, message: '请输入密码', trigger: 'blur' }
-        ],
-        nickname: [
-          { required: true, message: '请输入昵称', trigger: 'blur' }
+        name: [
+          { required: true, message: '请输入名称', trigger: 'blur' }
         ]
-      }
+      },
+      allPermissions: []
     }
   },
   mounted () {
@@ -137,11 +115,12 @@ export default {
     // 重置表单
     resetForm () {
       // this.$refs是一个对象，其中的属性formRef是表单的实例对象，可以直接调用表单方法
-      this.$refs.userForm.resetFields()
+      this.$refs.roleForm.resetFields()
     },
     // 渲染table中的数据
     async load () {
-      const { data: res } = await this.$http.get('/user', {
+      // 获取用户
+      const { data: res } = await this.$http.get('/role', {
         params: {
           pageNum: this.currentPage,
           pageSize: this.pageSize,
@@ -149,11 +128,41 @@ export default {
         }
       })
       if (res.flag) {
-        this.loading = false
         this.total = res.data.total
+        // 记录集合，其中每一个记录都有permissionsId属性，为自己权限id组成的数组
         this.tableData = res.data.records
       } else {
         this.$message.error('加载失败')
+      }
+      // 获取全部可用权限
+      const { data: res2 } = await this.$http.get('/permission/all')
+      if (res2.flag) {
+        this.allPermissions = res2.data
+      } else {
+        this.$message.error(res2.message)
+      }
+    },
+    // 保存权限的更改
+    async handleChange (row) {
+      // 当前的roleId
+      const roleId = row.id
+      const userId = JSON.parse(sessionStorage.getItem('user')).id
+
+      // 保存权限的更改
+      const { data: res } = await this.$http.put('/role/changePermission', row)
+      if (res.flag) {
+        this.$message.success('保存成功')
+        // 获取当前用户的roleId，如果操作是其所属role，那么需要重新登录
+        const { data: res2 } = await this.$http.get('/role/getByUserId', { params: { userId: userId } })
+        // res2.data中是当前用户的角色集合
+        res2.data.forEach(role => {
+          // 如果当前操作的角色是当前登录用户的角色，那么需要重新登录
+          if (role.id === roleId) {
+            this.$router.push('/login')
+          }
+        })
+      } else {
+        this.$message.error(res.message)
       }
     },
     // 改变当前每页的个数
@@ -173,14 +182,14 @@ export default {
     },
     save () {
       // 首先根据有无ID判断是更新（有ID）还是插入（无ID）
-      this.$refs.userForm.validate(async valid => {
+      this.$refs.roleForm.validate(async valid => {
         if (!valid) return
         let res
         if (this.form.id) { // 更新
           // 解构赋值：将data赋值给res
-          res = (await this.$http.put('/user', this.form)).data
+          res = (await this.$http.put('/role', this.form)).data
         } else { // 插入
-          res = (await this.$http.post('/user', this.form)).data
+          res = (await this.$http.post('/role', this.form)).data
         }
         if (res.flag) {
           this.$message.success(res.message)
@@ -195,11 +204,12 @@ export default {
     handleEdit (row) {
       // 深拷贝
       this.form = JSON.parse(JSON.stringify(row))
+      // 打开弹窗
       this.dialogVisible = true
     },
     // 删除事件
     async handleDelete (id) {
-      const { data: res } = await this.$http.delete('/user/' + id)
+      const { data: res } = await this.$http.delete('/role/' + id)
       if (res.flag) {
         this.$message.success(res.message)
       } else {

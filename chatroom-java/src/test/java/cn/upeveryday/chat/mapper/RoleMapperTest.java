@@ -24,7 +24,7 @@ class RoleMapperTest {
 
     @Test
     void getRolesById() {
-        List<Role> roles = roleMapper.getRolesById(1);
+        List<Role> roles = roleMapper.getRolesByUserId(1);
         for (Role role:
              roles) {
             System.out.println(role.getName());

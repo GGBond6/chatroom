@@ -16,44 +16,49 @@ public class UserController {
     @Autowired
     private UserServiceImpl userService;
 
-    //插入
+    //增
     @PostMapping
-    public Result save(@RequestBody User user){
+    public Result save(@RequestBody User user) {
         return userService.insert(user);
-     }
-     //更新
-     @PutMapping
-     public Result update(@RequestBody User user){
-        return userService.updateById(user);
-     }
-     //查询
-    @GetMapping
-    public Result findPage(@RequestParam(defaultValue = "1") Integer pageNum,
-                           @RequestParam(defaultValue = "10") Integer pageSize,
-                           @RequestParam(defaultValue = "") String search) {
-        return userService.findPage(pageNum,pageSize,search);
     }
 
-    //删除
+    //删
     @DeleteMapping("/{id}")
     public Result update(@PathVariable Long id) {
         return userService.deleteById(id);
     }
 
-    //登录
-    @PostMapping("/login")
-    public Result login(@RequestBody User user){
-        return userService.login(user.getUsername(),user.getPassword());
+    //改
+    @PutMapping
+    public Result update(@RequestBody User user) {
+        return userService.updateById(user);
     }
 
-    @PostMapping("/register")
-    public Result register(@RequestBody User user){
-        return userService.register(user.getUsername(),user.getPassword());
-    }
-
+    //查
     @GetMapping("/{id}")
     public Result getById(@PathVariable Long id) {
         return userService.selectById(id);
+    }
+
+    //分页查询
+    @GetMapping
+    public Result findPage(@RequestParam(defaultValue = "1") Integer pageNum,
+                           @RequestParam(defaultValue = "10") Integer pageSize,
+                           @RequestParam(defaultValue = "") String search) {
+        return userService.findPage(pageNum, pageSize, search);
+    }
+
+
+    //登录
+    @PostMapping("/login")
+    public Result login(@RequestBody User user) {
+        return userService.login(user.getUsername(), user.getPassword());
+    }
+
+    //注册
+    @PostMapping("/register")
+    public Result register(@RequestBody User user) {
+        return userService.register(user.getUsername(), user.getPassword());
     }
 
 

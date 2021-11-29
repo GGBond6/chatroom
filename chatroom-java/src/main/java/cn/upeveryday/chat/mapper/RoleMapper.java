@@ -1,8 +1,10 @@
 package cn.upeveryday.chat.mapper;
 
 import cn.upeveryday.chat.pojo.Permission;
+import cn.upeveryday.chat.pojo.Result;
 import cn.upeveryday.chat.pojo.Role;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
@@ -19,5 +21,8 @@ public interface RoleMapper extends BaseMapper<Role> {
     @Select("SELECT role.`comment`,role.`id`,role.`name` FROM user_role AS ur JOIN role\n" +
             "ON ur.`role_id`=role.`id`\n" +
             "AND ur.`user_id`=#{userId};")
-    List<Role> getRolesById(Integer userId);
+    List<Role> getRolesByUserId(Integer userId);
+
+    @Insert("INSERT INTO role_permission VALUES(#{roleId},#{permissionId});")
+    Integer insertRoleAndPermission(Integer roleId,Integer permissionId);
 }

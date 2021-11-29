@@ -1,6 +1,9 @@
 import Layout from '@/layout/Layout'
 import router from '@/router/index'
 
+/**
+ * 动态路由生成器
+ */
 export function dynamicRouter () {
   const userStr = sessionStorage.getItem('user')
   const root = {

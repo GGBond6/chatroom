@@ -1,12 +1,14 @@
 <template>
-<div>
-  message
-</div>
+  <div>
+    header
+    <slot></slot>
+    footer
+  </div>
 </template>
 
 <script>
 export default {
-  name: 'Message'
+  name: 'Content'
 }
 </script>
 

@@ -6,7 +6,8 @@ import ChatRoom from '@/views/ChatRoom'
 import Layout from '@/layout/Layout'
 import Person from '@/views/Person'
 import User from '@/views/User'
-import Message from '@/views/Message'
+import Permission from '@/views/Permission'
+import Role from '@/views/Role'
 Vue.use(VueRouter)
 
 const routes = [
@@ -20,11 +21,12 @@ const routes = [
     children: [
       { // 当 /chatroom 匹配成功，
         // Chatroom 会被渲染在 Layout 的 <router-view> 中
-        path: 'chatroom', component: ChatRoom
+        path: '/chatroom', component: ChatRoom
       },
       { path: '/user', component: User },
       { path: '/person', component: Person },
-      { path: '/message', component: Message }
+      { path: '/permission', component: Permission },
+      { path: '/role', component: Role }
     ]
   }
 ]
@@ -36,11 +38,11 @@ const router = new VueRouter({
 router.beforeEach((to, from, next) => {
   if (to.path === '/login') return next()
   if (to.path === '/register') return next()
-  // 获取token
-  // const token = window.sessionStorage.getItem('token')
-  // token不存在，则表示未登录，强制跳转至登录页
-  // if (!token) return next('/login')
-  // 已登录，放行
-  next()
+  const user = sessionStorage.getItem('user')
+  if (!user) {
+    next('/login')
+  } else {
+    next()
+  }
 })
 export default router

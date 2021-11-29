@@ -26,7 +26,9 @@
           <div class="header">{{ chatUser }}</div>
           <!--绑定content为此标签的innerHTML，content需要动态渲染上去-->
           <div class="content" v-html="content"></div>
-
+<!--          <Content1>-->
+<!--            我：{{text}}-->
+<!--          </Content1>-->
           <div class="footer">
             <textarea class="textarea" v-model="text"></textarea>
             <div class="send">
@@ -41,9 +43,14 @@
 </template>
 
 <script>
+import Content1 from '@/components/Content'
 let socket
 export default {
   name: 'ChatRoom',
+  components: {
+    // eslint-disable-next-line vue/no-unused-components
+    Content1
+  },
   data () {
     return {
       // 在线用户数组
