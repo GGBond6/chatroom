@@ -50,14 +50,9 @@
 </template>
 
 <script>
-import Content1 from '@/components/Content'
 let socket
 export default {
   name: 'ChatRoom',
-  components: {
-    // eslint-disable-next-line vue/no-unused-components
-    Content1
-  },
   data () {
     return {
       // 在线用户数组
@@ -92,8 +87,8 @@ export default {
         this.$message.error('当前浏览器不支持websocket协议')
       } else {
         console.log('当前浏览器支持websocket协议')
-        const socketUrl = 'ws://localhost:8080/chat/' + username
-        // const socketUrl = 'ws://8.133.163.7:8080/chat/' + username
+        // const socketUrl = 'ws://localhost:8080/chat/' + username
+        const socketUrl = 'ws://8.133.163.7:8080/chat/' + username
         if (socket != null) {
           // 还存在socket，那么关闭
           socket.close()
@@ -175,7 +170,7 @@ export default {
         if (to) { // 是我发的
           html = '<font color="#32cd32">' + '我：' + text + '</font>' + '<hr/>'
         } else if (from) { // 不是我发的
-          html = '<font color="#87cefa">' + this.user.username + '：' + text + '</font>' + '<hr/>'
+          html = '<font color="#87cefa">' + this.chatUser + '：' + text + '</font>' + '<hr/>'
         }
       }
       this.content += html

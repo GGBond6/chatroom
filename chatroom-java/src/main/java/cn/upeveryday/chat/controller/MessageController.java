@@ -19,7 +19,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author ggbond
  * 每个客户端都有一个这个类的对象与之对应（多例）
  */
-//@ServerEndpoint(value = "/chat/{username}")
+@ServerEndpoint(value = "/chat/{username}")
 @Controller
 public class MessageController {
     /**
@@ -88,24 +88,36 @@ public class MessageController {
      */
     @OnMessage
     public void onMessage(String message, Session session, @PathParam("username") String username) {
-        log.info("客户端收到用户{}的消息：{}", username, message);
+        log.info("服务器收到用户{}的消息：{}", username, message);
         //消息反序列化：将字符串解析为json对象
         JSONObject msg = JSONUtil.parseObj(message);
         //to表示发送给哪个用户（保存在客户端发送来的message中）
         String toUsername = msg.getStr("to");
         //text表示发送的消息文本
         String text = msg.getStr("text");
-        //根据用户名获取session，再通过session发送消息文本
-        Session toSession = onlineUsers.get(toUsername);
-        //将接收的消息转达给to用户
-        if (toSession != null) {
+        //群聊
+        if ("群聊".equals(toUsername)){
             //服务端再把消息进行组装，组装后的消息包含发送人和发送的内容
             JSONObject jsonObject = new JSONObject();
             //from表示此消息来自于哪个用户
             jsonObject.set("from", username);
+            jsonObject.set("to", "群聊");
             jsonObject.set("text", text);
-            //服务端给指定客户端发送消息
-            sendMessage(jsonObject.toString(), toSession);
+            //广播消息
+            sendAllMessage(jsonObject.toString());
+        }else{//单聊
+            //根据用户名获取session，再通过session发送消息文本
+            Session toSession = onlineUsers.get(toUsername);
+            //将接收的消息转达给to用户
+            if (toSession != null) {
+                //服务端再把消息进行组装，组装后的消息包含发送人和发送的内容
+                JSONObject jsonObject = new JSONObject();
+                //from表示此消息来自于哪个用户
+                jsonObject.set("from", username);
+                jsonObject.set("text", text);
+                //服务端给指定客户端发送消息
+                sendMessage(jsonObject.toString(), toSession);
+            }
         }
     }
 
@@ -123,7 +135,7 @@ public class MessageController {
     private void sendAllMessage(String message) {
         try {
             for (Session session : onlineUsers.values()) {
-                log.info("服务端给客户端[{}]发送消息{}", session.getId(), message);
+                log.info("服务器给客户端[{}]发送消息{}", session.getId(), message);
                 //同步
                 //session.getBasicRemote().sendText(message);
                 //异步（非阻塞）

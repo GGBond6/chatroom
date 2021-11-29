@@ -9,3 +9,6 @@ mybatis-plus:
   configuration:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl #在控制台打印SQL
     map-underscore-to-camel-case: true #开启驼峰命名转换
+#设置http参数限制
+server:
+  max-http-header-size: 100000
