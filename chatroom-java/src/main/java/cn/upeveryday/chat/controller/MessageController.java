@@ -22,8 +22,22 @@ import java.util.concurrent.ConcurrentHashMap;
 @ServerEndpoint(value = "/chat/{username}")
 @Controller
 public class MessageController {
+    /**
+     * 下面的方法不行
+     * spring默认管理单例，而websocket为多例对象
+     */
+//    @Autowired
+//    MessageService messageService;
+
+    //  这里使用静态，让 service 属于类
+    private static MessageService messageService;
+
+    // 注入的时候，给类的 service 注入
     @Autowired
-    MessageService MessageServiceImpl;
+    public void setChatService(MessageService messageService) {
+        MessageController.messageService = messageService;
+    }
+
     //日志对象
     private static final Logger log = LoggerFactory.getLogger(MessageController.class);
     /**
@@ -41,21 +55,21 @@ public class MessageController {
      */
     @OnOpen
     public void onOpen(Session session, @PathParam("username") String username) {
-            onlineUsers.put(username, session);
-            log.info("新用户{}加入，当前在线人数为{}", username, onlineUsers.size());
+        onlineUsers.put(username, session);
+        log.info("新用户{}加入，当前在线人数为{}", username, onlineUsers.size());
 
-            JSONObject result = new JSONObject();
-            JSONArray array = new JSONArray();
-            //users为数组类型，result={"users":[]}
-            result.set("users", array);
-            for (Object key : onlineUsers.keySet()) {
-                JSONObject jsonObject = new JSONObject();
-                jsonObject.set("username", key);
-                array.add(jsonObject);
-                //result={"users:[{"username":xxx1},{"username":xxx2]}}
-            }
-            //将对象序列化成json字符串进行传输，并且将消息发送给所有人
-            sendAllMessage(JSONUtil.toJsonStr(result));
+        JSONObject result = new JSONObject();
+        JSONArray array = new JSONArray();
+        //users为数组类型，result={"users":[]}
+        result.set("users", array);
+        for (Object key : onlineUsers.keySet()) {
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.set("username", key);
+            array.add(jsonObject);
+            //result={"users:[{"username":xxx1},{"username":xxx2]}}
+        }
+        //将对象序列化成json字符串进行传输，并且将消息发送给所有人
+        sendAllMessage(JSONUtil.toJsonStr(result));
     }
 
     /**

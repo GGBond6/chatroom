@@ -11,10 +11,13 @@
           <!--用户列表-->
           <div v-for="(user,index) in users" class="content" :key="index">
             <div v-if="user.username!=='undefined'">
+              <el-button @click="chatUser=user.username">
               <span >{{ user.username }}</span>
               <!--当用户点击不同聊天图标时，更换当前聊天对象-->
-              <i class="el-icon-chat-dot-round" @click="chatUser=user.username"></i>
-              <span v-if="user.username===chatUser" class="chatting">chatting</span>
+              </el-button>
+              <span v-if="user.username===chatUser" class="chatting">
+                <i class="el-icon-chat-dot-round" ></i>
+                chatting</span>
             </div>
           </div>
         </el-card>
@@ -26,9 +29,6 @@
           <div class="header">{{ chatUser }}</div>
           <!--绑定content为此标签的innerHTML，content需要动态渲染上去-->
           <div class="content" v-html="content"></div>
-<!--          <Content1>-->
-<!--            我：{{text}}-->
-<!--          </Content1>-->
           <div class="footer">
             <textarea class="textarea" v-model="text"></textarea>
             <div class="send">
@@ -68,6 +68,48 @@ export default {
     }
   },
   methods: {
+    // 组件挂载完毕后进行初始化
+    init () {
+      // 获取当前对象：如果sessionStorage中user存在，则将其反序列化赋值给user，否则赋值为空对象
+      this.user = sessionStorage.getItem('user') ? JSON.parse(sessionStorage.getItem('user')) : {}
+      // 获取当前用户名
+      const username = this.user.username
+      const _this = this
+      //
+      if (typeof (WebSocket) === 'undefined') {
+        this.$message.error('当前浏览器不支持websocket协议')
+      } else {
+        console.log('当前浏览器支持websocket协议')
+        const socketUrl = 'ws://localhost:8080/chat/' + username
+        // const socketUrl = 'ws://8.133.163.7:8080/chat/' + username
+        if (socket != null) {
+          // 还存在socket，那么关闭
+          socket.close()
+          socket = null
+        }
+        // 开启一个socket服务
+        socket = new WebSocket(socketUrl)
+        // 打开事件
+        socket.onopen = function () {
+          console.log('websocket已打开')
+        }
+        // 接收消息事件（获得客户端的消息）【注意在此之内的this指socket对象】
+        socket.onmessage = function (msg) {
+          console.log('收到数据：' + msg.data)
+          // 对收到的json数据反序列化 {"users": [{"username": "zhang"},{ "username": "admin"}]}
+          const data = JSON.parse(msg.data)
+          if (data.users) { // 客户端发来的msg中包含users，表明为群发
+            // 获取当前连接的所有用户信息，并且排除自身【filter() 方法创建一个新数组, 其包含通过所提供函数实现的测试的所有元素】
+            _this.users = data.users.filter(user => user.username !== username)
+          } else { // 客户端发来的msg中不包含users，那么就不是群发，而是单聊，发送过来的就是聊天文本json数据，比如// {"from": "zhang", "text": "hello"}
+            if (data.from === _this.chatUser) { // 发送方from和当前的聊天对象相同
+              _this.messages.push(data)// 向messages数组中添加数据
+              _this.createContent(data.from, null, data.text)
+            }
+          }
+        }
+      }
+    },
     send () {
       if (!this.chatUser) {
         return this.$message.warning('请选择聊天对象')
@@ -93,59 +135,16 @@ export default {
         this.text = ''
       }
     },
-    // 当组件挂载完成后，初始化的方法
-    init () {
-      // sessionStorage中user若存在，则将字符串经过json解析赋值给user，否则赋值为空对象
-      this.user = sessionStorage.getItem('user') ? JSON.parse(sessionStorage.getItem('user')) : {}
-      // 获取当前用户名
-      const username = this.user.username
-      const _this = this
-      //
-      if (typeof (WebSocket) === 'undefined') {
-        this.$message.error('当前浏览器不支持此聊天应用')
-      } else {
-        console.log('当前浏览器支持websocket协议')
-        const socketUrl = 'ws://localhost:8080/chat/' + username
-        // const socketUrl = 'ws://8.133.163.7:8080/chat/' + username
-        if (socket != null) {
-          // 还存在socket，那么关闭
-          socket.close()
-          socket = null
-        }
-        // 开启一个socket服务
-        socket = new WebSocket(socketUrl)
-        // 打开事件
-        socket.onopen = function () {
-          console.log('websocket已打开')
-        }
-        // 接收消息事件（获得客户端的消息）
-        socket.onmessage = function (msg) {
-          console.log('收到数据：' + msg.data)
-          // 对收到的json数据反序列化 {"users": [{"username": "zhang"},{ "username": "admin"}]}
-          const data = JSON.parse(msg.data)
-          if (data.users) {
-            // 获取当前连接的所有用户信息，并且排除自身
-            _this.users = data.users.filter(user => user.username !== username)
-          } else { // 客户端发来的msg中不包含users，那么就不是群发，而是单聊，发送过来的就是聊天文本json数据，比如// {"from": "zhang", "text": "hello"}
-            if (data.from === _this.chatUser) { // 发送方from和当前的聊天对象相同
-              _this.messages.push(data)// 向messages数组中添加数据
-              _this.createContent(data.from, null, data.text)
-            }
-          }
-        }
-      }
-    },
     // 将json的聊天消息记录转换成HTML
     // nowUser表示是否是当前用户发送的消息
     // 根据不同的用户渲染不同的HTML
     createContent (remoteUser, nowUser, text) {
       let html
       if (nowUser) {
-        html = '我:' + text + '<hr/>'
+        html = '<font color="#32cd32">' + '我：' + text + '</font>' + '<hr/>'
       } else if (remoteUser) {
-        html = this.user.nickname + ':' + text + '<hr/>'
+        html = '<font color="#87cefa">' + this.user.nickname + '：' + text + '</font>' + '<hr/>'
       }
-      console.log(html)
       this.content += html
     }
   },
