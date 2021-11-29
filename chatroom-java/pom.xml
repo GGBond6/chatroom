@@ -9,9 +9,9 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>cn.upeveryday</groupId>
-    <artifactId>springboot</artifactId>
+    <artifactId>chatroom</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>springboot</name>
+    <name>chatroom</name>
     <description>chat</description>
     <properties>
         <java.version>1.8</java.version>

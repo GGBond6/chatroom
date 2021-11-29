@@ -20,7 +20,7 @@ public interface UserMapper extends BaseMapper<User> {
     @Insert("INSERT INTO user VALUES (null,#{username},#{password},NULL,NULL,NULL,NULL,NULL)")
     Boolean insertInto(String username,String password);
 
-    @Select("SELECT ur.`role_id` FROM USER JOIN user_role AS ur\n" +
+    @Select("SELECT ur.`role_id` FROM user JOIN user_role AS ur\n" +
             "ON user.`id`=ur.`user_id` AND user.`id`=#{userId};")
     List<Integer> getRolesIdByUserId(Integer userId);
     @Insert("INSERT INTO user_role VALUES(#{userId},#{roleId});")

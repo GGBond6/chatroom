@@ -17,11 +17,11 @@ services:
       - MYSQL_ROOT_PASSWORD=123456
 #  redis:
 #    image: redis:latest
-  websocket:
-    image: websocket:latest
+  chatroom:
+    image: chatroom:latest
     build: .    # 表示以当前目录下的Dockerfile开始构建镜像
     ports:
       - 8080:8080
-    depends_on:   # 依赖于mysql、redis，其实可以不填，默认已经表示可以
+    depends_on:   # 依赖于mysql、redis
       - mysql
 #      - redis

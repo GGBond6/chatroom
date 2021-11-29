@@ -6,12 +6,19 @@
         <el-card class="left-card">
           <!--标题-->
           <div class="header">
-            <span>在线用户</span>
+            <el-button @click="clickGroupChat">
+              群聊</el-button>
+            <span v-if="'群聊'===chatUser" class="chatting">
+                <i class="el-icon-chat-dot-round" ></i>
+                chatting</span>
+            <hr>
+            <div style="text-align: center">在线用户</div>
           </div>
           <!--用户列表-->
           <div v-for="(user,index) in users" class="content" :key="index">
             <div v-if="user.username!=='undefined'">
-              <el-button @click="chatUser=user.username">
+              <el-button @click="chatUser = user.username
+              content = ''">
               <span >{{ user.username }}</span>
               <!--当用户点击不同聊天图标时，更换当前聊天对象-->
               </el-button>
@@ -68,6 +75,11 @@ export default {
     }
   },
   methods: {
+    //
+    clickGroupChat () {
+      this.chatUser = '群聊'
+      this.content = ''
+    },
     // 组件挂载完毕后进行初始化
     init () {
       // 获取当前对象：如果sessionStorage中user存在，则将其反序列化赋值给user，否则赋值为空对象
@@ -101,9 +113,10 @@ export default {
           if (data.users) { // 客户端发来的msg中包含users，表明为群发
             // 获取当前连接的所有用户信息，并且排除自身【filter() 方法创建一个新数组, 其包含通过所提供函数实现的测试的所有元素】
             _this.users = data.users.filter(user => user.username !== username)
+          } if (data.to === '群聊') { // from记录的是谁发的，即remoteUser，发送给nowUser（群聊）
+            _this.createContent(data.from, '群聊', data.text)
           } else { // 客户端发来的msg中不包含users，那么就不是群发，而是单聊，发送过来的就是聊天文本json数据，比如// {"from": "zhang", "text": "hello"}
             if (data.from === _this.chatUser) { // 发送方from和当前的聊天对象相同
-              _this.messages.push(data)// 向messages数组中添加数据
               _this.createContent(data.from, null, data.text)
             }
           }
@@ -117,7 +130,16 @@ export default {
         return this.$message.warning('请输入内容')
       } else if (typeof WebSocket === 'undefined') {
         return this.$message.warning('您的浏览器不支持WebSocket')
-      } else {
+      } else if (this.chatUser === '群聊') { // 是群聊
+        const message = {
+          from: this.user.username,
+          to: '群聊',
+          text: this.text
+        }
+        // 将json对象序列化，并发送给服务端
+        socket.send(JSON.stringify(message))
+        this.text = ''
+      } else { // 私聊
         // 组装待发送的消息
         const message = {
           from: this.user.username,
@@ -138,12 +160,23 @@ export default {
     // 将json的聊天消息记录转换成HTML
     // nowUser表示是否是当前用户发送的消息
     // 根据不同的用户渲染不同的HTML
-    createContent (remoteUser, nowUser, text) {
+    createContent (from, to, text) {
       let html
-      if (nowUser) {
-        html = '<font color="#32cd32">' + '我：' + text + '</font>' + '<hr/>'
-      } else if (remoteUser) {
-        html = '<font color="#87cefa">' + this.user.nickname + '：' + text + '</font>' + '<hr/>'
+      if (to === '群聊' && this.chatUser === '群聊') { // 是群聊并且当前是群聊界面
+        if (from === this.user.username) { // 是群聊并且是我发的
+          html = '<font color="#32cd32">' + '我：' + text + '</font>' + '<hr/>'
+        } else { // 是群聊但不是我发的
+          html = '<font color="#87cefa">' + from + '：' + text + '</font>' + '<hr/>'
+        }
+      } else if (to === '群聊' && this.chatUser !== '群聊') { // 是群聊但不是群聊界面
+        // 什么都不做
+        html = ''
+      } else { // 不是群聊
+        if (to) { // 是我发的
+          html = '<font color="#32cd32">' + '我：' + text + '</font>' + '<hr/>'
+        } else if (from) { // 不是我发的
+          html = '<font color="#87cefa">' + this.user.username + '：' + text + '</font>' + '<hr/>'
+        }
       }
       this.content += html
     }
@@ -178,13 +211,13 @@ export default {
 
   .content {
     padding: 10px 0;
-
-    .chatting {
-      font-size: 12px;
-      color: limegreen;
-      margin-left: 5px
-    }
   }
+}
+
+.chatting {
+  font-size: 12px;
+  color: limegreen;
+  margin-left: 5px
 }
 
 .right-card {
