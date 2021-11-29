@@ -17,37 +17,61 @@
         prop="id"
         label="ID"
         sortable
+        width="80"
       >
       </el-table-column>
       <el-table-column
         prop="username"
-        label="用户名">
+        label="用户名"
+        width="140">
       </el-table-column>
       <el-table-column
         prop="nickname"
-        label="昵称">
+        label="昵称"
+        width="140">
       </el-table-column>
       <el-table-column
         prop="age"
-        label="年龄">
+        label="年龄"
+        width="80">
       </el-table-column>
       <el-table-column
         prop="sex"
-        label="性别">
+        label="性别"
+        width="80">
       </el-table-column>
       <el-table-column
         prop="address"
-        label="地址">
+        label="地址"
+        width="140">
       </el-table-column>
       <el-table-column
         prop="avatar"
         label="头像"
+        width="100"
         show-overflow-tooltip=true>
+      </el-table-column>
+      <el-table-column
+        label="角色菜单"
+       >
+        <!--作用域插槽：子组件给父组件传递数据（scope对象）-->
+        <template slot-scope="scope">
+          <!--v-model绑定的是选中的value组成的数组-->
+          <el-select v-model="scope.row.rolesId" multiple placeholder="请选择">
+            <el-option
+              v-for="item in allRoles"
+              :key="item.id"
+              :label="item.comment"
+              :value="item.id">
+            </el-option>
+          </el-select>
+        </template>
       </el-table-column>
       <!--操作-->
       <el-table-column label="操作">
         <!--通过带属性的插槽可以获取到 row, column, $index 和 store（table 内部的状态管理）的数据-->
         <template slot-scope="scope">
+          <el-button size="mini" type="primary" @click="handleChange(scope.row)">保存角色</el-button>
           <el-button size="mini" icon="el-icon-edit" title="编辑"
                      @click="handleEdit( scope.row)"></el-button>
           <el-button size="mini" type="danger" icon="el-icon-delete" title="删除"
@@ -72,7 +96,7 @@
           <el-input v-model="form.username" style="width: 80%"></el-input>
         </el-form-item>
         <el-form-item label="密码" prop="password">
-          <el-input v-model="form.password" style="width: 80%"></el-input>
+          <el-input show-password v-model="form.password" style="width: 80%"></el-input>
         </el-form-item>
         <el-form-item label="昵称" prop="nickname">
           <el-input v-model="form.nickname" style="width: 80%"></el-input>
@@ -106,7 +130,7 @@ export default {
   name: 'User',
   data () {
     return {
-      loading: true,
+      loading: false,
       tableData: [],
       currentPage: 1, // 当前页数
       pageSize: 10, // 每页的大小
@@ -126,7 +150,8 @@ export default {
         nickname: [
           { required: true, message: '请输入昵称', trigger: 'blur' }
         ]
-      }
+      },
+      allRoles: []
     }
   },
   mounted () {
@@ -141,6 +166,7 @@ export default {
     },
     // 渲染table中的数据
     async load () {
+      this.loading = true
       const { data: res } = await this.$http.get('/user', {
         params: {
           pageNum: this.currentPage,
@@ -149,11 +175,35 @@ export default {
         }
       })
       if (res.flag) {
-        this.loading = false
         this.total = res.data.total
         this.tableData = res.data.records
       } else {
         this.$message.error('加载失败')
+      }
+
+      // 获取全部角色
+      const { data: res2 } = await this.$http.get('/role/all')
+      if (res2.flag) {
+        this.allRoles = res2.data
+      } else {
+        this.$message.error(res2.message)
+      }
+      this.loading = false
+    },
+    // 保存权限的更改
+    async handleChange (row) {
+      const rowId = row.id
+      const userId = JSON.parse(sessionStorage.getItem('user')).id
+      // 保存角色的更改
+      const { data: res } = await this.$http.put('/user/changeRole', row)
+      if (res.flag) {
+        this.$message.success('保存成功')
+        // 如果操作的用户为当前登录用户，那么重新登录
+        if (rowId === userId) {
+          this.$router.push('/login')
+        }
+      } else {
+        this.$message.error(res.message)
       }
     },
     // 改变当前每页的个数

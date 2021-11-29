@@ -7,7 +7,7 @@ import {
   MenuItem, MenuItemGroup, Submenu,
   Avatar, Table, TableColumn, Popconfirm,
   Pagination, Dialog, Radio, Descriptions, DescriptionsItem,
-  Select, Option
+  Select, Option, Loading
 } from 'element-ui'
 // 使用Vue.use进行全局注册
 Vue.use(Button)
@@ -39,5 +39,6 @@ Vue.use(Descriptions)
 Vue.use(DescriptionsItem)
 Vue.use(Select)
 Vue.use(Option)
+Vue.use(Loading)
 
 Vue.prototype.$message = Message

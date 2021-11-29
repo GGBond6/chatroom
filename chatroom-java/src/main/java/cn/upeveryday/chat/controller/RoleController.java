@@ -91,4 +91,10 @@ public class RoleController {
             return Result.error();
         }
     }
+
+    //查询全部
+    @GetMapping("/all")
+    public Result findAll(){
+        return roleService.findAll();
+    }
 }

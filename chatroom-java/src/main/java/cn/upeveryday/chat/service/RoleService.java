@@ -23,4 +23,6 @@ public interface RoleService {
     Result findPage(Integer pageNum, Integer pageSize, String search);
 
     Integer insertRoleAndPermission(Integer id, Integer id1);
+
+    Result findAll();
 }

@@ -12,6 +12,8 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 import static com.baomidou.mybatisplus.core.toolkit.Wrappers.query;
 
 /**
@@ -47,17 +49,17 @@ public class UserServiceImpl implements UserService {
     public Result register(String username, String password) {
         Result result = new Result();
         User user = userMapper.selectByUsername(username);
-        if (user==null){
+        if (user == null) {
             Boolean bool = userMapper.insertInto(username, password);
-            if (bool){
+            if (bool) {
                 result.setFlag(true);
                 result.setMessage("注册成功");
-            }else {
+            } else {
                 result.setFlag(false);
                 result.setMessage("注册失败");
             }
 
-        }else{
+        } else {
             result.setFlag(false);
             result.setMessage("此用户名已存在");
         }
@@ -76,11 +78,14 @@ public class UserServiceImpl implements UserService {
     @Override
     public Result insert(User user) {
         Result result = new Result();
+        //用户表插入
         int i = userMapper.insert(user);
-        if (i!=0){
+        //用户角色表插入（角色ID默认为1，即普通用户）
+        Integer j = userMapper.insertRoleAndUserDefault(user.getId());
+        if (i != 0 && j != 0) {
             result.setFlag(true);
             result.setMessage("数据保存成功");
-        }else {
+        } else {
             result.setFlag(false);
             result.setMessage("数据保存失败");
         }
@@ -91,11 +96,11 @@ public class UserServiceImpl implements UserService {
     public Result updateById(User user) {
         Result result = new Result();
         int i = userMapper.updateById(user);
-        if (i!=0){
+        if (i != 0) {
             result.setFlag(true);
             result.setMessage("更新成功");
             result.setData(user);
-        }else {
+        } else {
             result.setFlag(false);
             result.setMessage("更新失败");
         }
@@ -106,7 +111,7 @@ public class UserServiceImpl implements UserService {
     public Result findPage(Integer pageNum, Integer pageSize, String search) {
         Result result = new Result();
 
-        Page<User>  userPage=new Page<>(pageNum, pageSize);
+        Page<User> userPage = new Page<>(pageNum, pageSize);
         QueryWrapper wrapper = new QueryWrapper();
         //当search不为空时，再加入到条件构造器
         if (StrUtil.isNotBlank(search)) {
@@ -115,11 +120,17 @@ public class UserServiceImpl implements UserService {
         wrapper.orderByAsc("id");
         Page<User> res = userMapper.selectPage(userPage, wrapper);
         //res里面有total和records
-        if (res!=null){
+        if (res != null) {
+            //查询出每一个user的角色集合
+            List<User> users = res.getRecords();
+            for (User user : users) {
+                List<Integer> usersId = userMapper.getRolesIdByUserId(user.getId());
+                user.setRolesId(usersId);
+            }
             result.setFlag(true);
             result.setMessage("查询成功");
             result.setData(res);
-        }else {
+        } else {
             result.setFlag(false);
             result.setMessage("查询失败");
         }
@@ -130,13 +141,18 @@ public class UserServiceImpl implements UserService {
     public Result deleteById(Long id) {
         Result result = new Result();
         int i = userMapper.deleteById(id);
-        if (i!=0){
+        if (i != 0) {
             result.setFlag(true);
             result.setMessage("删除成功");
-        }else {
+        } else {
             result.setFlag(false);
             result.setMessage("删除失败");
         }
         return result;
+    }
+
+    @Override
+    public Integer insertRoleAndUser(Integer userId, Integer roleId) {
+        return userMapper.insertRoleAndUser(userId, roleId);
     }
 }

@@ -18,4 +18,6 @@ public interface UserService {
     Result findPage(Integer pageNum, Integer pageSize, String search);
 
     Result deleteById(Long id);
+
+    Integer insertRoleAndUser(Integer userId, Integer roleId);
 }

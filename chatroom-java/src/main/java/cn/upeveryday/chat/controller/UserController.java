@@ -1,6 +1,8 @@
 package cn.upeveryday.chat.controller;
 
+import cn.upeveryday.chat.mapper.RoleMapper;
 import cn.upeveryday.chat.pojo.Result;
+import cn.upeveryday.chat.pojo.Role;
 import cn.upeveryday.chat.pojo.User;
 import cn.upeveryday.chat.service.impl.UserServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +17,9 @@ public class UserController {
 
     @Autowired
     private UserServiceImpl userService;
+
+    @Autowired
+    private RoleMapper roleMapper;
 
     //增
     @PostMapping
@@ -61,5 +66,21 @@ public class UserController {
         return userService.register(user.getUsername(), user.getPassword());
     }
 
+    //改变当前用户的角色
+    @PutMapping("/changeRole")
+    public Result changeRole(@RequestBody User user){
+        try{
+            //先删除已有的角色
+            Integer i = roleMapper.deleteRolesByUserId(user.getId());
+            //再插入新的权限
+            for (Integer roleId : user.getRolesId()) {
+                userService.insertRoleAndUser(user.getId(), roleId);
+            }
+            return Result.success();
+        }catch (Exception e){
+            e.printStackTrace();
+            return Result.error();
+        }
+    }
 
 }

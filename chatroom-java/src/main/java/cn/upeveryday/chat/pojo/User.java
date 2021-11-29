@@ -24,4 +24,6 @@ public class User {
 
     @TableField(exist = false)//数据库中不存在此字段
     private List<Permission> permissions;
+    @TableField(exist = false)
+    private List<Integer> rolesId;
 }

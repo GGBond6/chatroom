@@ -90,7 +90,7 @@ export default {
   name: 'Role',
   data () {
     return {
-      loading: true,
+      loading: false,
       tableData: [],
       currentPage: 1, // 当前页数
       pageSize: 10, // 每页的大小
@@ -119,6 +119,7 @@ export default {
     },
     // 渲染table中的数据
     async load () {
+      this.loading = true
       // 获取用户
       const { data: res } = await this.$http.get('/role', {
         params: {
@@ -141,6 +142,7 @@ export default {
       } else {
         this.$message.error(res2.message)
       }
+      this.loading = false
     },
     // 保存权限的更改
     async handleChange (row) {

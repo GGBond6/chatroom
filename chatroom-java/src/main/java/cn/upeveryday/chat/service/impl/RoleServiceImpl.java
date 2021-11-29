@@ -76,8 +76,8 @@ public class RoleServiceImpl implements RoleService {
         LambdaQueryWrapper<Role> wrapper = new LambdaQueryWrapper<>();
         wrapper.like(StrUtil.isNotBlank(search), Role::getComment, search);
         Page<Role> pages = roleMapper.selectPage(page, wrapper);
-        List<Role> records = pages.getRecords();
         if (pages!=null){
+            List<Role> records = pages.getRecords();
             //查出每个角色的权限ID集合
             for (Role role : records) {
                 List<Integer> permissionsId = permissionMapper.getPermissionsIdByRoleId(role.getId());
@@ -93,6 +93,12 @@ public class RoleServiceImpl implements RoleService {
     public Integer insertRoleAndPermission(Integer roleId, Integer permissionId) {
         Integer i = roleMapper.insertRoleAndPermission(roleId, permissionId);
         return i;
+    }
+
+    @Override
+    public Result findAll() {
+        List<Role> roles = roleMapper.selectList(null);
+        return Result.success(roles);
     }
 
 

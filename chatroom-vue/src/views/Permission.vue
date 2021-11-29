@@ -115,6 +115,7 @@ export default {
     },
     // 加载table中的数据
     async load () {
+      this.loading = true
       const { data: res } = await this.$http.get('/permission', {
         params: {
           pageNum: this.currentPage,
@@ -128,6 +129,7 @@ export default {
       } else {
         this.$message.error('加载失败')
       }
+      this.loading = false
     },
     // 改变当前每页的个数
     handleSizeChange (pageSize) {

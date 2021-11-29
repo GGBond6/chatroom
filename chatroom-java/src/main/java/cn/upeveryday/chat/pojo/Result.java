@@ -44,7 +44,7 @@ public class Result<T> {
     public static Result error() {
         Result result = new Result();
         result.setFlag(false);
-        result.setMessage("成功");
+        result.setMessage("失败");
         return result;
     }
     public static Result error(String message) {
