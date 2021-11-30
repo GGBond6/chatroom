@@ -6,7 +6,7 @@
         <el-card class="left-card">
           <!--标题-->
           <div class="header">
-            <el-button @click="clickGroupChat">
+            <el-button autofocus @click="clickGroupChat">
               群聊</el-button>
             <span v-if="'群聊'===chatUser" class="chatting">
                 <i class="el-icon-chat-dot-round" ></i>
@@ -15,16 +15,18 @@
             <div style="text-align: center">在线用户</div>
           </div>
           <!--用户列表-->
-          <div v-for="(user,index) in users" class="content" :key="index">
-            <div v-if="user.username!=='undefined'">
-              <el-button @click="chatUser = user.username
+          <div style="height: 200px;overflow: auto">
+            <div v-for="(user,index) in users" class="content" :key="index">
+              <div v-if="user.username!=='undefined'">
+                <el-button @click="chatUser = user.username
               content = ''">
-              <span >{{ user.username }}</span>
-              <!--当用户点击不同聊天图标时，更换当前聊天对象-->
-              </el-button>
-              <span v-if="user.username===chatUser" class="chatting">
+                  <span >{{ user.username }}</span>
+                  <!--当用户点击不同聊天图标时，更换当前聊天对象-->
+                </el-button>
+                <span v-if="user.username===chatUser" class="chatting">
                 <i class="el-icon-chat-dot-round" ></i>
                 chatting</span>
+              </div>
             </div>
           </div>
         </el-card>
@@ -35,7 +37,7 @@
         <div class="right-card">
           <div class="header">{{ chatUser }}</div>
           <!--绑定content为此标签的innerHTML，content需要动态渲染上去-->
-          <div class="content" v-html="content"></div>
+          <div class="content" v-html="content" style="margin: 10px"></div>
           <div class="footer">
             <textarea class="textarea" v-model="text"></textarea>
             <div class="send">
@@ -178,6 +180,7 @@ export default {
   },
   mounted () {
     this.init()
+    this.clickGroupChat()
   }
 }
 </script>
@@ -197,7 +200,7 @@ export default {
   width: 300px;
   height: 300px;
   color: #333;
-  margin-left: 10px;
+  margin:0 30px;
 
   .header {
     padding-bottom: 10px;
